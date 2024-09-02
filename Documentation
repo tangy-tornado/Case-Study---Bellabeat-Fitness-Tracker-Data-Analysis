@@ -1,0 +1,339 @@
+ASK
+
+Stated the Business task. 
+
+PREPARE
+
+1.	Started selecting the required data for the process.
+a.	Out of 18 datasets i decided to go with 11 datasets.
+b.	Those are - 
+i.	Daily Activity
+ii.	Daily Calories
+iii.	Daily Intensities
+iv.	Daily Steps
+v.	Heart Rate Seconds
+vi.	Hourly Calories
+vii.	Hourly Intensities
+viii.	Hourly Steps
+ix.	Minutes Sleep
+x.	Sleep Day
+xi.	Weight Log Info
+c.	Started checking all the data files just to find out that heart_rate data has only 6 unique users, weight_log has 8 users. We won’t be using minutes_sleep because it has less values when compared to daily_sleep, so we’ll be dropping these datasets from our analysis.
+d.	Daily_activity contains the data from daily_calories, daily_intensities and daily_steps, so we’ll drop these 3 datasets and we’ll move with daily_activity dataset only.
+e.	We’ll focus on only 5 datasets, i.e., -
+i.	Daily Activity
+ii.	Hourly Calories
+iii.	Hourly Intensities
+iv.	Hourly Steps
+v.	Sleep Day
+2.	Started to covert the CSV files to Excel Workbook, for compatibility in editing.
+3.	Started cleaning process.
+
+a.	Daily Activity -  
+i.	It has 15 columns, 941 rows and 33 users.
+ii.	Adjust column width
+iii.	Freeze top row and Bold.
+iv.	The ActivityDate column had mm-dd-yyyy or m/dd/yyyy types without column formatted into date. So, we used - 
+‘ =IF(LEN(B2) = 10, TEXT(B2, "mm-dd-yyyy"), TEXT(B2, "m/dd/yyyy"))’ in a new column, formula to set all the dates to same format and formatted the column to m/dd/yyyy format. Now we copied and pasted it as values only in the new column and formatted it as m-dd-yyyy.
+v.	Sorted whole sheet according to date. The date range was 4/12/2016 to 5/12/2016 and had 33 unique user ID.
+vi.	No blanks were found in the dataset.
+vii.	No duplicates were found
+viii.	Steps, Minutes and Calories column are set to positive number with no decimals. Whereas Distance column was set to positive number with 2pt decimal.
+ix.	Create a new column to find the remaining minutes in the day, using - 
+‘=1440 - SUM(K2, L2, M2, N2)’. This formula subtracts the recorded minutes from total minutes in a day. Format was negative number without decimal. I applied filter to cross check any negative values but none were found.
+x.	16 columns and 941 rows.
+b.	Hourly Calories - 
+i.	It has 3 columns, 22100 rows and 33 users.
+ii.	Adjust column width
+iii.	Freeze top row and Bold.
+iv.	Rename ActivityHour to ActivityDate, and create new column ActivityTime.
+v.	Using Text to columns i separated ActivityDate column with space as delimiter. It gave 3 columns - date, time, AM/PM. Next I formatted date column to m-dd-yyyy. Now i used this formula - =TEXT(C2, "hh:mm:ss") & " " & D2, to combine both time and AM/PM column. Next, I used this formula - =TEXT(TIMEVALUE(E2), "hh:mm"), to convert it into hh:mm format. Changed the column format ot same.
+vi.	I need to change date format from m-dd-yyyy to m/dd/yyyy, to maintain consistency across my datasets. So, i used this formula - =TEXT(SUBSTITUTE(B2, "-", "/"), "m/dd/yyyy"), after using this formula in a new column i copy pasted the values only to original column.
+vii.	Sorted whole sheet w.r.t date and time using custom sort by selecting all data columns(number as text).
+viii.	No blank cells were found.
+ix.	No duplicates were found.
+x.	4 columns, 22100 rows.
+c.	Hourly Intensities -
+i.	It has 4 columns, 22100 rows and 33 users.
+ii.	Adjust column width
+iii.	Freeze top row and Bold.
+iv.	Rename ActivityHour to ActivityDate, and create new column ActivityTime.
+v.	Using Text to columns i separated ActivityDate column with space as delimiter. It gave 3 columns - date, time, AM/PM. Next I formatted date column to m-dd-yyyy. Now i used this formula - =TEXT(C2, "hh:mm:ss") & " " & D2, to combine both time and AM/PM column. Next, I used this formula - =TEXT(TIMEVALUE(E2), "hh:mm"), to convert it into hh:mm format. Changed the column format ot same.
+vi.	I need to change date format from m-dd-yyyy to m/dd/yyyy, to maintain consistency across my datasets. So, i used this formula - =TEXT(SUBSTITUTE(B2, "-", "/"), "m/dd/yyyy"), after using this formula in a new column i copy pasted the values only to original column.
+vii.	Sorted whole sheet w.r.t date and time using custom sort by selecting all data columns(number as text).
+viii.	No blank cells were found.
+ix.	No duplicates were found.
+x.	Set Total Intensity columns to positive number without decimal & Average Intensity with 2 decimal pt.
+xi.	5 columns, 22100 rows.
+d.	Hourly Steps -
+i.	It has 3 columns, 22100 rows and 33 users.
+ii.	Adjust column width
+iii.	Freeze top row and Bold.
+iv.	Rename ActivityHour to ActivityDate, and create new column ActivityTime.
+v.	Using Text to columns i separated ActivityDate column with space as delimiter. It gave 3 columns - date, time, AM/PM. Next I formatted date column to m-dd-yyyy. Now i used this formula - =TEXT(C2, "hh:mm:ss") & " " & D2, to combine both time and AM/PM column. Next, I used this formula - =TEXT(TIMEVALUE(E2), "hh:mm"), to convert it into hh:mm format. Changed the column format ot same.
+vi.	I need to change date format from m-dd-yyyy to m/dd/yyyy, to maintain consistency across my datasets. So, i used this formula - =TEXT(SUBSTITUTE(B2, "-", "/"), "m/dd/yyyy"), after using this formula in a new column i copy pasted the values only to original column.
+vii.	Sorted whole sheet w.r.t date and time using custom sort by selecting all data columns(number as text).
+viii.	No blank cells were found.
+ix.	No duplicates were found.
+x.	4 columns, 22100 rows.
+e.	Sleep Day - 
+i.	5 columns, 414 rows and 24 users.
+ii.	Adjust column width
+iii.	Freeze top row and Bold.
+iv.	Use text to columns to convert sleepday to only date format. Once used it separates it to date, time & AM/PM. Then convert the date column format to m-dd-yyyy and delete the other 2 columns. 
+v.	Use =TEXT(B2,”dddd”) to get weekday.
+vi.	Now change the date format from “-” to “/” using this formula - =IF(ISNUMBER(B2), TEXT(B2, "m/dd/yyyy"), IF(ISNUMBER(DATE(VALUE(MID(B2, SEARCH("-", B2)+1, 4)), VALUE(LEFT(B2, SEARCH("-", B2)-1)), VALUE(MID(B2, SEARCH("-", B2)+1, 2)))), TEXT(DATE(VALUE(MID(B2, SEARCH("-", B2)+1, 4)), VALUE(LEFT(B2, SEARCH("-", B2)-1)), VALUE(MID(B2, SEARCH("-", B2)+1, 2))), "m/dd/yyyy"), ""))
+vii.	Sort whole sheet w.r.t date.
+viii.	I need to find % of time asleep & in bed, so i used these formulas - =IFERROR(E2/F2, ""), =IFERROR(1 - G2, "").
+ix.	Now i need a total% column - =IFERROR(G2 + H2, "") 
+f.	Saved all the files in CSV format, and exported to BigQuery.
+g.	Created a new dataset called fitabase and added all these tables(5).
+h.	Created a new table using inner join between calories, intensities and steps - 
+CREATE TABLE fitabase.joined_table AS
+SELECT
+  a.* EXCEPT(Id, ActivityDate, ActivityTime), -- Exclude common columns from table a
+  b.* EXCEPT(Id, ActivityDate, ActivityTime), -- Exclude common columns from table b
+  c.*
+FROM
+  fitabase.HourlyCalories a
+INNER JOIN
+  fitabase.HourlyIntensities b
+ON
+  a.Id = b.Id AND a.ActivityDate = b.ActivityDate AND a.ActivityTime = b.ActivityTime
+INNER JOIN
+  fitabase.HourlySteps c
+ON
+  a.Id = c.Id AND a.ActivityDate = c.ActivityDate AND a.ActivityTime = c.ActivityTime
+ORDER BY ActivityDate, ActivityTime;
+
+i.	Started executing queries and creating required tables for analysis (saving all created tables).
+j.	No of Users -  
+SELECT Id,
+COUNT(Id) AS TotalId
+FROM `fitabase.DailyActivity`
+GROUP BY Id
+ORDER BY TotalId;
+The range was 4-31
+
+k.	User Category - 
+SELECT Id,
+  TotalUsers,
+  CASE
+    WHEN TotalUsers BETWEEN 27 AND 31 THEN 'Active User'
+    WHEN TotalUsers BETWEEN 16 AND 26 THEN 'Regular User'
+    WHEN TotalUsers BETWEEN 0 AND 15 THEN 'Casual User'
+  END AS UserCategory
+FROM (
+  SELECT Id, COUNT(Id) AS TotalUsers
+  FROM `fitabase.DailyActivity`
+  GROUP BY Id
+  ORDER BY TotalUsers);
+
+l.	DA_min_max_avg - 
+SELECT Id,
+ROUND(MIN(TotalSteps),2) AS MinTotalSteps,
+ROUND(MAX(TotalSteps),2) AS MaxTotalSteps,
+ROUND(AVG(TotalSteps),2) AS AvgTotalSteps,
+ROUND(MIN(TotalDistance),2) AS MinTotalDist,
+ROUND(MAX(TotalDistance),2) AS MaxTotalDist,
+ROUND(AVG(TotalDistance),2) AS AvgTotalDist,
+ROUND(MIN(Calories),2) AS MinCalories,
+ROUND(MAX(Calories),2) AS MaxCalories,
+ROUND(AVG(Calories),2) AS AvgCalories,
+ROUND(MIN(VeryActiveMinutes),2) AS MinVeryActiveMinutes,
+ROUND(MAX(VeryActiveMinutes),2) AS MaxVeryActiveMinutes,
+ROUND(AVG(VeryActiveMinutes),2) AS AvgVeryActiveMinutes,
+ROUND(MIN(FairlyActiveMinutes),2) AS MinFairlyActiveMinutes,
+ROUND(MAX(FairlyActiveMinutes),2) AS MaxFairlyActiveMinutes,
+ROUND(AVG(FairlyActiveMinutes),2) AS AvgFairlyActiveMinutes,
+ROUND(MIN(LightlyActiveMinutes),2) AS MinLightlyActiveMinutes,
+ROUND(MAX(LightlyActiveMinutes),2) AS MaxLightlyActiveMinutes,
+ROUND(AVG(LightlyActiveMinutes),2) AS AvgLightlyActiveMinutes,
+ROUND(MIN(SedentaryMinutes),2) AS MinSedentaryMinutes,
+ROUND(MAX(SedentaryMinutes),2) AS MaxSedentaryMinutes,
+ROUND(AVG(SedentaryMinutes),2) AS AvgSedentaryMinutes
+FROM `fitabase.DailyActivity`
+GROUP BY id
+ORDER BY id
+
+
+m.	avg_act_mins - 
+SELECT Id,
+ROUND(Avg(veryactiveMinutes),2) AS AvgVeryActiveMinutes,
+ROUND(Avg(fairlyactiveMinutes),2) AS AvgFairlyActiveMinutes,
+ROUND(Avg(lightlyactiveMinutes),2) AS AvgLightlyActiveMinutes,
+ROUND(Avg(sedentaryminutes),2) AS AvgSedentaryMinutes
+FROM `fitabase.DailyActivity`
+GROUP BY Id
+ORDER BY 2;
+
+I edited it again after uploading my data into PBi and while creating Viz
+
+SELECT Id, 'Very Active' AS ActivityType, ROUND(Avg(veryactiveMinutes), 2) AS AvgMinutes
+FROM `fitabase.DailyActivity`
+GROUP BY Id
+
+UNION ALL
+
+SELECT Id, 'Fairly Active' AS ActivityType, ROUND(Avg(fairlyactiveMinutes), 2) AS AvgMinutes
+FROM `fitabase.DailyActivity`
+GROUP BY Id
+
+UNION ALL
+
+SELECT Id, 'Lightly Active' AS ActivityType, ROUND(Avg(lightlyactiveMinutes), 2) AS AvgMinutes
+FROM `fitabase.DailyActivity`
+GROUP BY Id
+
+UNION ALL
+
+SELECT Id, 'Sedentary' AS ActivityType, ROUND(Avg(sedentaryminutes), 2) AS AvgMinutes
+FROM `fitabase.DailyActivity`
+GROUP BY Id
+
+ORDER BY Id, ActivityType;
+
+
+n.	UserLifestyle - 
+SELECT
+  Id,
+  CAST(ROUND(AVG(TotalSteps)) AS INT64) AS AvgTotalSteps,
+  CASE
+    WHEN ROUND(AVG(TotalSteps)) < 5000 THEN 'Minimal Activity'
+    WHEN ROUND(AVG(TotalSteps)) BETWEEN 5000 AND 7499 THEN 'Easygoing Activity'
+    WHEN ROUND(AVG(TotalSteps)) BETWEEN 7500 AND 9999 THEN 'Steady Activity'
+    WHEN ROUND(AVG(TotalSteps)) BETWEEN 10000 AND 12499 THEN 'Regular Activity'
+    WHEN ROUND(AVG(TotalSteps)) > 12499 THEN 'Intense Activity'
+  END AS TotalStepsIndex
+FROM
+  `fitabase.DailyActivity`
+GROUP BY
+  Id
+
+o.	WHORecommendation - 
+SELECT
+  Id,
+  CAST(AVG(veryactiveminutes) + AVG(fairlyactiveminutes) + AVG(lightlyactiveminutes) AS INT64) AS TotalAvgActiveMins,
+  CASE
+    WHEN AVG(veryactiveminutes) + AVG(fairlyactiveminutes) + AVG(lightlyactiveminutes) >= 300 THEN 'Exceeds WHO'
+    WHEN AVG(veryactiveminutes) + AVG(fairlyactiveminutes) + AVG(lightlyactiveminutes) BETWEEN 150 AND 300 THEN 'Meets WHO'
+    WHEN AVG(veryactiveminutes) + AVG(fairlyactiveminutes) + AVG(lightlyactiveminutes) < 150 THEN 'Below WHO'
+  END AS WHORecommendation
+FROM
+  `fitabase.DailyActivity`
+GROUP BY Id
+ORDER BY TotalAvgActiveMins;
+p.	I needed to create a weekday column in DailyActivvity using Sleepday column from SleepDay table so - 
+CREATE TABLE `fitabase.NewDailyActivity` AS
+SELECT
+  da.*,
+  sd.unique_weekday AS new_weekday
+FROM (
+  SELECT
+    SleepDay,
+    MAX(weekday) AS unique_weekday  -- Use an appropriate aggregation function
+  FROM
+    `fitabase.SleepDay`
+  GROUP BY
+    SleepDay) sd
+JOIN
+  `fitabase.DailyActivity` da
+ON
+  sd.SleepDay = da.ActivityDate;
+
+To verify the create table date matches the old table - 
+SELECT
+  COUNT(*) AS total_records,
+  COUNTIF(d1.ActivityDate IS NULL OR d2.ActivityDate IS NULL) AS mismatched_records
+FROM
+  `fitabase.DailyActivity` d1
+FULL OUTER JOIN
+  `fitabase.NewDailyActivity` d2
+ON
+  d1.ActivityDate = d2.ActivityDate;
+q.	WeekdayMins - 
+SELECT Weekday,
+ROUND(Avg(veryactiveMinutes),2) AS AvgVeryActiveMinutes,
+ROUND(Avg(fairlyactiveMinutes),2) AS AvgFairlyActiveMinutes,
+ROUND(Avg(lightlyactiveMinutes),2) AS AvgLightlyActiveMinutes,
+ROUND(Avg(sedentaryminutes),2) AS AvgSedentaryMinutes
+FROM `fitabase.NewDailyActivity`
+GROUP BY Weekday
+ORDER BY 2,3,4,5 DESC
+r.	WeekdayAct - 
+SELECT
+  Weekday,
+  ROUND(AVG(TotalSteps),2) AS AvgSteps,
+  ROUND(AVG(TotalDistance),2) AS AvgDist,
+  ROUND(AVG(Calories),2) AS Calories
+ FROM `fitabase.NewDailyActivity`
+GROUP BY Weekday
+ORDER BY 2 DESC
+s.	Steps-Sleep - 
+SELECT
+  sd.id,
+  CAST(AVG(dailyactivity.totalsteps) AS INT64) AS AvgTotalSteps,
+  dailyactivity.Weekday AS Weekday,
+  CAST(ROUND(AVG(sd.totaltimeinbed), 2) AS INT64) AS AvgTimeinBed,
+  CAST(ROUND(AVG(sd.totalminutesasleep), 2) AS INT64) AS AvgTimeAsleep,
+  CAST(ROUND(AVG(sd.totaltimeinbed - sd.totalminutesasleep), 2) AS INT64) AS AvgTimeAwake
+FROM
+  `fitabase.SleepDay` sd
+INNER JOIN
+  `fitabase.NewDailyActivity` dailyactivity
+ON
+  dailyactivity.id = sd.id
+GROUP BY
+  sd.id, dailyactivity.Weekday
+ORDER BY
+  6 DESC;
+t.	SleepPercent -
+SELECT id,
+COUNT(id) AS NumOfEntry,
+ROUND((AVG(TotalMinutesAsleep))/60) AS AvgHoursAsleep,
+MIN(_OfTimeAsleep) AS MinPercentage,
+MAX(_OfTimeAsleep) AS MaxPercentage,
+ROUND(AVG(_OfTimeAsleep)) AS AvgPercentage
+FROM `fitabase.SleepDay`
+GROUP BY id
+ORDER BY AvgHoursAsleep DESC
+4.	Export the dataset from Bigquery.
+a.	Export to sheets > Download > CSV > Open file > Save As(rename) - xlsx > Open file > freeze top row & Bold > Rename Sheet > Make Req Changes.
+5.	Now Import these datasets into PBI.
+6.	Edit column data type etc
+7.	I was getting an error in date type format so i couldn’t load tables with date column. I opened those tables in excel to edit and make it compatible.
+a.	Insert 4 columns
+b.	Replace / with -.
+c.	Use text to columns and split the date columns into 3
+d.	Change the format to general
+e.	Use DATE(year,month,day) function and combine all columns.
+f.	Copy and paste it as values and delete remaining columns.
+g.	Rename it and save it.
+8.	I was struggling to choose which data tables to use, which parameter to select, which color combination will go well and what type of charts to use.
+9.	I wanted to create a heatmap table for users steps by weekday. Used matrix table to create it initially but later felt a heck load of trouble to sort weekday in order. PBI doesn’t give custom option to sort column headers. So i created another table using DAX formula - 
+Sort =
+SELECTCOLUMNS(
+    VALUES('DailyActivity'[Weekday]),
+    "Weekday", 'DailyActivity'[Weekday],
+    "Order",
+        SWITCH (
+            'DailyActivity'[Weekday],
+            "Monday", 1,
+            "Tuesday", 2,
+            "Wednesday", 3,
+            "Thursday", 4,
+            "Friday", 5,
+            "Saturday", 6,
+            "Sunday", 7,
+            BLANK()
+        )
+)
+
+a.	And later established relation between this table and source table using weekday column.
+b.	Create a custom column in source table - 
+Order = RELATED(Sort[Order])
+c.	Later went to table view again and sorted weekday column in new table using order column. And added that weekday column to matrix viz, took me nearly 2 hours to figure that out. 
+
+
+
+
