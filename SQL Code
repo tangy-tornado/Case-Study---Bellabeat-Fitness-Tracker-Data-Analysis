@@ -1,0 +1,190 @@
+j.	No of Users -  
+SELECT Id,
+COUNT(Id) AS TotalId
+FROM `fitabase.DailyActivity`
+GROUP BY Id
+ORDER BY TotalId;
+The range was 4-31
+
+k.	User Category - 
+SELECT Id,
+  TotalUsers,
+  CASE
+    WHEN TotalUsers BETWEEN 27 AND 31 THEN 'Active User'
+    WHEN TotalUsers BETWEEN 16 AND 26 THEN 'Regular User'
+    WHEN TotalUsers BETWEEN 0 AND 15 THEN 'Casual User'
+  END AS UserCategory
+FROM (
+  SELECT Id, COUNT(Id) AS TotalUsers
+  FROM `fitabase.DailyActivity`
+  GROUP BY Id
+  ORDER BY TotalUsers);
+
+l.	DA_min_max_avg - 
+SELECT Id,
+ROUND(MIN(TotalSteps),2) AS MinTotalSteps,
+ROUND(MAX(TotalSteps),2) AS MaxTotalSteps,
+ROUND(AVG(TotalSteps),2) AS AvgTotalSteps,
+ROUND(MIN(TotalDistance),2) AS MinTotalDist,
+ROUND(MAX(TotalDistance),2) AS MaxTotalDist,
+ROUND(AVG(TotalDistance),2) AS AvgTotalDist,
+ROUND(MIN(Calories),2) AS MinCalories,
+ROUND(MAX(Calories),2) AS MaxCalories,
+ROUND(AVG(Calories),2) AS AvgCalories,
+ROUND(MIN(VeryActiveMinutes),2) AS MinVeryActiveMinutes,
+ROUND(MAX(VeryActiveMinutes),2) AS MaxVeryActiveMinutes,
+ROUND(AVG(VeryActiveMinutes),2) AS AvgVeryActiveMinutes,
+ROUND(MIN(FairlyActiveMinutes),2) AS MinFairlyActiveMinutes,
+ROUND(MAX(FairlyActiveMinutes),2) AS MaxFairlyActiveMinutes,
+ROUND(AVG(FairlyActiveMinutes),2) AS AvgFairlyActiveMinutes,
+ROUND(MIN(LightlyActiveMinutes),2) AS MinLightlyActiveMinutes,
+ROUND(MAX(LightlyActiveMinutes),2) AS MaxLightlyActiveMinutes,
+ROUND(AVG(LightlyActiveMinutes),2) AS AvgLightlyActiveMinutes,
+ROUND(MIN(SedentaryMinutes),2) AS MinSedentaryMinutes,
+ROUND(MAX(SedentaryMinutes),2) AS MaxSedentaryMinutes,
+ROUND(AVG(SedentaryMinutes),2) AS AvgSedentaryMinutes
+FROM `fitabase.DailyActivity`
+GROUP BY id
+ORDER BY id
+
+
+m.	avg_act_mins - 
+SELECT Id,
+ROUND(Avg(veryactiveMinutes),2) AS AvgVeryActiveMinutes,
+ROUND(Avg(fairlyactiveMinutes),2) AS AvgFairlyActiveMinutes,
+ROUND(Avg(lightlyactiveMinutes),2) AS AvgLightlyActiveMinutes,
+ROUND(Avg(sedentaryminutes),2) AS AvgSedentaryMinutes
+FROM `fitabase.DailyActivity`
+GROUP BY Id
+ORDER BY 2;
+
+I edited it again after uploading my data into PBi and while creating Viz
+
+SELECT Id, 'Very Active' AS ActivityType, ROUND(Avg(veryactiveMinutes), 2) AS AvgMinutes
+FROM `fitabase.DailyActivity`
+GROUP BY Id
+
+UNION ALL
+
+SELECT Id, 'Fairly Active' AS ActivityType, ROUND(Avg(fairlyactiveMinutes), 2) AS AvgMinutes
+FROM `fitabase.DailyActivity`
+GROUP BY Id
+
+UNION ALL
+
+SELECT Id, 'Lightly Active' AS ActivityType, ROUND(Avg(lightlyactiveMinutes), 2) AS AvgMinutes
+FROM `fitabase.DailyActivity`
+GROUP BY Id
+
+UNION ALL
+
+SELECT Id, 'Sedentary' AS ActivityType, ROUND(Avg(sedentaryminutes), 2) AS AvgMinutes
+FROM `fitabase.DailyActivity`
+GROUP BY Id
+
+ORDER BY Id, ActivityType;
+
+
+n.	UserLifestyle - 
+SELECT
+  Id,
+  CAST(ROUND(AVG(TotalSteps)) AS INT64) AS AvgTotalSteps,
+  CASE
+    WHEN ROUND(AVG(TotalSteps)) < 5000 THEN 'Minimal Activity'
+    WHEN ROUND(AVG(TotalSteps)) BETWEEN 5000 AND 7499 THEN 'Easygoing Activity'
+    WHEN ROUND(AVG(TotalSteps)) BETWEEN 7500 AND 9999 THEN 'Steady Activity'
+    WHEN ROUND(AVG(TotalSteps)) BETWEEN 10000 AND 12499 THEN 'Regular Activity'
+    WHEN ROUND(AVG(TotalSteps)) > 12499 THEN 'Intense Activity'
+  END AS TotalStepsIndex
+FROM
+  `fitabase.DailyActivity`
+GROUP BY
+  Id
+
+o.	WHORecommendation - 
+SELECT
+  Id,
+  CAST(AVG(veryactiveminutes) + AVG(fairlyactiveminutes) + AVG(lightlyactiveminutes) AS INT64) AS TotalAvgActiveMins,
+  CASE
+    WHEN AVG(veryactiveminutes) + AVG(fairlyactiveminutes) + AVG(lightlyactiveminutes) >= 300 THEN 'Exceeds WHO'
+    WHEN AVG(veryactiveminutes) + AVG(fairlyactiveminutes) + AVG(lightlyactiveminutes) BETWEEN 150 AND 300 THEN 'Meets WHO'
+    WHEN AVG(veryactiveminutes) + AVG(fairlyactiveminutes) + AVG(lightlyactiveminutes) < 150 THEN 'Below WHO'
+  END AS WHORecommendation
+FROM
+  `fitabase.DailyActivity`
+GROUP BY Id
+ORDER BY TotalAvgActiveMins;
+p.	I needed to create a weekday column in DailyActivvity using Sleepday column from SleepDay table so - 
+CREATE TABLE `fitabase.NewDailyActivity` AS
+SELECT
+  da.*,
+  sd.unique_weekday AS new_weekday
+FROM (
+  SELECT
+    SleepDay,
+    MAX(weekday) AS unique_weekday  -- Use an appropriate aggregation function
+  FROM
+    `fitabase.SleepDay`
+  GROUP BY
+    SleepDay) sd
+JOIN
+  `fitabase.DailyActivity` da
+ON
+  sd.SleepDay = da.ActivityDate;
+
+To verify the create table date matches the old table - 
+SELECT
+  COUNT(*) AS total_records,
+  COUNTIF(d1.ActivityDate IS NULL OR d2.ActivityDate IS NULL) AS mismatched_records
+FROM
+  `fitabase.DailyActivity` d1
+FULL OUTER JOIN
+  `fitabase.NewDailyActivity` d2
+ON
+  d1.ActivityDate = d2.ActivityDate;
+q.	WeekdayMins - 
+SELECT Weekday,
+ROUND(Avg(veryactiveMinutes),2) AS AvgVeryActiveMinutes,
+ROUND(Avg(fairlyactiveMinutes),2) AS AvgFairlyActiveMinutes,
+ROUND(Avg(lightlyactiveMinutes),2) AS AvgLightlyActiveMinutes,
+ROUND(Avg(sedentaryminutes),2) AS AvgSedentaryMinutes
+FROM `fitabase.NewDailyActivity`
+GROUP BY Weekday
+ORDER BY 2,3,4,5 DESC
+r.	WeekdayAct - 
+SELECT
+  Weekday,
+  ROUND(AVG(TotalSteps),2) AS AvgSteps,
+  ROUND(AVG(TotalDistance),2) AS AvgDist,
+  ROUND(AVG(Calories),2) AS Calories
+ FROM `fitabase.NewDailyActivity`
+GROUP BY Weekday
+ORDER BY 2 DESC
+s.	Steps-Sleep - 
+SELECT
+  sd.id,
+  CAST(AVG(dailyactivity.totalsteps) AS INT64) AS AvgTotalSteps,
+  dailyactivity.Weekday AS Weekday,
+  CAST(ROUND(AVG(sd.totaltimeinbed), 2) AS INT64) AS AvgTimeinBed,
+  CAST(ROUND(AVG(sd.totalminutesasleep), 2) AS INT64) AS AvgTimeAsleep,
+  CAST(ROUND(AVG(sd.totaltimeinbed - sd.totalminutesasleep), 2) AS INT64) AS AvgTimeAwake
+FROM
+  `fitabase.SleepDay` sd
+INNER JOIN
+  `fitabase.NewDailyActivity` dailyactivity
+ON
+  dailyactivity.id = sd.id
+GROUP BY
+  sd.id, dailyactivity.Weekday
+ORDER BY
+  6 DESC;
+t.	SleepPercent -
+SELECT id,
+COUNT(id) AS NumOfEntry,
+ROUND((AVG(TotalMinutesAsleep))/60) AS AvgHoursAsleep,
+MIN(_OfTimeAsleep) AS MinPercentage,
+MAX(_OfTimeAsleep) AS MaxPercentage,
+ROUND(AVG(_OfTimeAsleep)) AS AvgPercentage
+FROM `fitabase.SleepDay`
+GROUP BY id
+ORDER BY AvgHoursAsleep DESC
